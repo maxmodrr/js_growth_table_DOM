@@ -1,14 +1,15 @@
 'use strict';
 
-// write code here
 const table = document.querySelector('tbody');
+const container = document.querySelector('.container');
 const buttonAddRow = document.querySelector('.append-row.button');
 const buttonAddColumn = document.querySelector('.append-column.button');
 const buttonRemoveColumn = document.querySelector('.remove-column.button');
 const buttonRemoveRow = document.querySelector('.remove-row.button');
 
-document.addEventListener('click', () => {
-  const columns = document.querySelector('tr').children.length;
+const updateButtonStates = () => {
+  const firstRow = document.querySelector('tr');
+  const columns = firstRow ? firstRow.children.length : 0;
   const rows = document.querySelectorAll('tr').length;
 
   if (columns === 10) {
@@ -17,7 +18,7 @@ document.addEventListener('click', () => {
     buttonAddColumn.removeAttribute('disabled');
   }
 
-  if (columns === 2) {
+  if (columns <= 2) {
     buttonRemoveColumn.setAttribute('disabled', 'disabled');
   } else {
     buttonRemoveColumn.removeAttribute('disabled');
@@ -29,43 +30,65 @@ document.addEventListener('click', () => {
     buttonAddRow.removeAttribute('disabled');
   }
 
-  if (rows === 2) {
+  if (rows <= 2) {
     buttonRemoveRow.setAttribute('disabled', 'disabled');
   } else {
     buttonRemoveRow.removeAttribute('disabled');
   }
+};
+
+container.addEventListener('click', (e) => {
+  if (e.target.matches('.button')) {
+    updateButtonStates();
+  }
 });
 
 buttonAddRow.addEventListener('click', () => {
-  const newRow = document.createElement('tr');
-  const rowCount = document.querySelector('tr').children.length;
+  const firstRow = document.querySelector('tr');
+  const rowCount = firstRow ? firstRow.children.length : 0;
 
-  for (let i = 0; i < rowCount; i++) {
-    const column = document.createElement('td');
+  if (rowCount > 0) {
+    const newRow = document.createElement('tr');
 
-    newRow.append(column);
+    for (let i = 0; i < rowCount; i++) {
+      const column = document.createElement('td');
+
+      newRow.append(column);
+    }
+    table.append(newRow);
   }
-  table.append(newRow);
+
+  updateButtonStates();
 });
 
 buttonAddColumn.addEventListener('click', () => {
   const tr = document.querySelectorAll('tr');
 
-  tr.forEach((elem) => {
+  tr.forEach((row) => {
     const newColumn = document.createElement('td');
 
-    elem.append(newColumn);
+    row.append(newColumn);
   });
+
+  updateButtonStates();
 });
 
 buttonRemoveColumn.addEventListener('click', () => {
-  const columns = [...document.querySelectorAll('tr')];
+  const tr = document.querySelectorAll('tr');
 
-  columns.forEach((elem) => {
-    elem.removeChild(elem.lastElementChild);
+  tr.forEach((row) => {
+    if (row.children.length > 0) {
+      row.removeChild(row.lastElementChild);
+    }
   });
+
+  updateButtonStates();
 });
 
 buttonRemoveRow.addEventListener('click', () => {
-  table.removeChild(table.lastElementChild);
+  if (table.children.length > 0) {
+    table.removeChild(table.lastElementChild);
+  }
+
+  updateButtonStates();
 });
